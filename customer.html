@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Форма для продавца</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Форма для продавца</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="auth.html">Авторизация</a></li>
+                <li><a href="add-delete-edit.html">Добавить информацию</a></li>
+                <li><a href="search-view.html">Поиск информации</a></li>
+                <li><a href="admin.html">Администратор</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <form id="seller-form">
+            <label for="client-name">Имя клиента:</label>
+            <input type="text" id="client-name" name="client-name">
+            <label for="card-number">Номер карточки:</label>
+            <input type="text" id="card-number" name="card-number">
+            <div class="actions">
+                <button type="button" onclick="registerClient()">Зарегистрировать клиента</button>
+                <button type="button" onclick="editProfile()">Редактировать профиль</button>
+            </div>
+        </form>
+    </main>
+    <footer>
+        <p>Нижняя информационная часть</p>
+    </footer>
+
+    <script>
+        function registerClient() {
+            // Логика для регистрации клиента
+            alert('Клиент зарегистрирован');
+        }
+
+        function editProfile() {
+            // Логика для редактирования профиля клиента
+            alert('Профиль клиента отредактирован');
+        }
+    </script>
+</body>
+</html>

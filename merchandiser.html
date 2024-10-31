@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Форма управления продуктами</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Форма для товароведа</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="auth.html">Авторизация</a></li>
+                <li><a href="add-delete-edit.html">Добавить информацию</a></li>
+                <li><a href="search-view.html">Поиск информации</a></li>
+                <li><a href="admin.html">Администратор</a></li>
+            </ul>
+        </nav>
+    </header>
+<body>
+    <header>
+        <h1>Управление продуктами</h1>
+    </header>
+    <main>
+        <form id="product-form">
+            <label for="product-id">ID продукта:</label>
+            <input type="text" id="product-id" name="product-id" readonly>
+            <label for="product-name">Название продукта:</label>
+            <input type="text" id="product-name" name="product-name">
+            <label for="product-description">Описание продукта:</label>
+            <textarea id="product-description" name="product-description"></textarea>
+            <label for="product-price">Цена продукта:</label>
+            <input type="number" id="product-price" name="product-price">
+            <div class="actions">
+                <button type="button" onclick="addProduct()">Добавить продукт</button>
+                <button type="button" onclick="editProduct()">Сохранить изменения</button>
+                <button type="button" onclick="deleteProduct()">Удалить продукт</button>
+            </div>
+        </form>
+    </main>
+    <footer>
+        <p>Нижняя информационная часть</p>
+    </footer>
+
+    <script>
+        function addProduct() {
+            // Логика для добавления продукта
+            alert('Продукт добавлен');
+        }
+
+        function editProduct() {
+            // Логика для редактирования продукта
+            alert('Изменения сохранены');
+        }
+
+        function deleteProduct() {
+            // Логика для удаления продукта
+            alert('Продукт удален');
+        }
+    </script>
+</body>
+</html>
