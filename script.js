@@ -353,6 +353,7 @@ var workSessions = [
         role: "Товаровед"
     }
 ];
+
 class ObjManager {
     #customers = [];
     #products = [];
@@ -371,8 +372,7 @@ class ObjManager {
         this.#employees = employees;
         this.#workSessions = workSessions;}
 
-
-    getObjs(arrayName, skip = 0, top = 10, filterConfig = {}) {
+    getObjs(arrayName, skip = 0, top = 20, filterConfig = {}) {
         let array = this.#getArrayByName(arrayName);
         if (Object.keys(filterConfig).length > 0) {
             array = this.#applyFilter(array, filterConfig);
@@ -401,7 +401,8 @@ class ObjManager {
             return false;
         }
 
-        if (typeof obj.author !== 'string' || obj.author.length == 0) {
+        if (typeof obj.author !== 'string' || obj.author.length === 0) {
+            
             return false;
         }
 
@@ -409,7 +410,8 @@ class ObjManager {
     }
 
     addObj(arrayName, obj) {
-        if (!this.validateObj(arrayName, obj) || this.#getArrayByName(arrayName).some(existingObj => existingObj.id === obj.id)) {
+        if (!this.validateObj(obj) || this.#getArrayByName(arrayName).some(existingObj => existingObj.id === obj.id)) {
+           console.log(this.validateObj(obj));
             return false;
         }
 
@@ -421,7 +423,8 @@ class ObjManager {
         let array = this.#getArrayByName(arrayName);
         var existingObj = array.find(o => o.id === id);
 
-        if (!existingObj || !this.validateObj(arrayName, obj)) {
+        if (!existingObj || !this.validateObj(obj)) {
+            console.log(11);
             return false;
         }
 
@@ -485,6 +488,118 @@ class ObjManager {
 }
 
 var objManager = new ObjManager(customers, products, invoices, sales, employees, workSessions);
+
+const user='admin';
+var buttonContainer = document.getElementById('buttons_place');
+var roleContainer=document.getElementById('role');
+var NamePlace=document.getElementById('info');
+
+    if (user === 'admin') {
+        const username=document.createElement('article');
+        username.textContent=user;
+      const editButton = document.createElement('button');
+      editButton.textContent = 'Редактировать';
+      const addButton = document.createElement('button');
+      addButton.textContent = 'Добавить';
+      const deleteButton = document.createElement('button');
+      deleteButton.textContent = 'Удалить';
+      const SearchButton = document.createElement('button');
+      SearchButton.textContent = 'Поиск';
+      roleContainer.appendChild(username);
+      buttonContainer.appendChild(editButton);
+      buttonContainer.appendChild(addButton);
+      buttonContainer.appendChild(deleteButton);
+      buttonContainer.appendChild(SearchButton);
+      const ArrayDivName=document.createElement('article');
+      ArrayDivName.textContent='Информация о объектах ObjInf:'
+      NamePlace.appendChild(ArrayDivName);
+    }
+
+      function renderTable(Name, filterConfig) 
+      {
+        var ShowingArray=objManager.getObjs(Name, 0, 20, filterConfig)
+        if (ShowingArray.length === 0) {
+            container.innerHTML = '<p>No data to display</p>';
+            return false;
+          }
+          
+        const container = document.getElementById('table');
+        const table = document.createElement('table');
+        const thead = document.createElement('thead');
+        container.innerHTML='';
+        thead.innerHTML = `
+          <tr>
+            <th>ID</th>
+            <th>Description</th>
+            <th>Date</th>
+            <th>Author</th>
+          </tr>
+        `;
+        table.appendChild(thead);
+        const tbody = document.createElement('tbody');
+        ShowingArray.forEach(item => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${item.id}</td>
+            <td>${item.description}</td>
+            <td>${item.createdAt.toLocaleDateString()}</td>
+            <td>${item.author}</td>
+          `;
+  
+          tbody.appendChild(row);
+        });
+  
+        table.appendChild(tbody);
+        container.appendChild(table);
+        return true;
+      }
+
+      function deleteFromTable(Name, id)
+      {
+        if(objManager.removeObj(Name, id))
+        {
+            renderTable(Name);
+            return true;
+        };
+        return false;
+      }
+
+        function addInTable(Name, obj)
+        {
+            if(objManager.addObj(Name, obj))
+            {
+                renderTable(Name);
+                return true;
+            };  
+            return false;
+        }
+
+        function editTable(Name, id, obj)
+        {
+            if(objManager.editObj(Name, id, obj))
+            {
+                renderTable(Name);
+                return true;
+            };
+            return false;
+        }
+        const TableManager = {
+            renderTable,
+            deleteFromTable,
+            addInTable,
+            editTable,
+          };
+          
+
+      //TableManager.addInTable('customers', { id: "23", description: 'Иванов Иван', createdAt: new Date(), author: 'Администратор', totalSpent: 500, discountPercent: 5 } )
+      //TableManager.addInTable('customers', { id: "22", description: 'Иванов Иван', createdAt: new Date(), author: 'Администратор', totalSpent: 500, discountPercent: 5 } )
+      //TableManager.renderTable('customers', {description: "Иванов Иван"});
+      //TableManager.deleteFromTable('customers', "1");
+      //TableManager.addInTable('customers', { id: "23", description: 'Иванов Иван', createdAt: new Date(), author: 'Администратор', totalSpent: 500, discountPercent: 5 } )
+      //TableManager.renderTable('employees');
+      //TableManager.addInTable('employees', {id: "430", description: "Петров Петр 2", createdAt: new Date("2024-01-16"), author: "Администратор", role: "Продавец", contactInfo: {phone: "+123456789", email: "petrov@example.com"}})
+      //TableManager.editTable('employees', '401', {id: "401", description: "Петров Петр new", createdAt: new Date("2024-01-16"), author: "Администратор", role: "Продавец", contactInfo: {phone: "+123456789", email: "petrov@example.com"}});
+      //TableManager.deleteFromTable('employees', "404");
 
 //console.log(objManager.addObj('customers', { id: '23', description: 'Иванов Иван', createdAt: new Date(), author: 'Администратор', totalSpent: 500, discountPercent: 5 }));
 
