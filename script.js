@@ -487,35 +487,45 @@ class ObjManager {
     }
 }
 
+//model
+
 var objManager = new ObjManager(customers, products, invoices, sales, employees, workSessions);
 
-const user='admin';
-var buttonContainer = document.getElementById('buttons_place');
-var roleContainer=document.getElementById('role');
-var NamePlace=document.getElementById('info');
+//View
 
-    if (user === 'admin') {
-        const username=document.createElement('article');
-        username.textContent=user;
-      const editButton = document.createElement('button');
-      editButton.textContent = 'Редактировать';
-      const addButton = document.createElement('button');
-      addButton.textContent = 'Добавить';
-      const deleteButton = document.createElement('button');
-      deleteButton.textContent = 'Удалить';
-      const SearchButton = document.createElement('button');
-      SearchButton.textContent = 'Поиск';
-      roleContainer.appendChild(username);
-      buttonContainer.appendChild(editButton);
-      buttonContainer.appendChild(addButton);
-      buttonContainer.appendChild(deleteButton);
-      buttonContainer.appendChild(SearchButton);
-      const ArrayDivName=document.createElement('article');
-      ArrayDivName.textContent='Информация о объектах ObjInf:'
-      NamePlace.appendChild(ArrayDivName);
-    }
+class View{
 
-      function renderTable(Name, filterConfig) 
+    constructor(role) {
+        this.user = role;
+        this.buttonContainer = document.getElementById('buttons_place');
+        this.roleContainer = document.getElementById('role');
+        this.NamePlace = document.getElementById('info');
+    
+        if (this.user === 'admin') {
+          const username = document.createElement('article');
+          username.textContent = this.user;
+          const editButton = document.createElement('button');
+          editButton.textContent = 'Редактировать';
+          const addButton = document.createElement('button');
+          addButton.textContent = 'Добавить';
+          const deleteButton = document.createElement('button');
+          deleteButton.textContent = 'Удалить';
+          const SearchButton = document.createElement('button');
+          SearchButton.textContent = 'Поиск';
+    
+          this.roleContainer.appendChild(username);
+          this.buttonContainer.appendChild(editButton);
+          this.buttonContainer.appendChild(addButton);
+          this.buttonContainer.appendChild(deleteButton);
+          this.buttonContainer.appendChild(SearchButton);
+    
+          const ArrayDivName = document.createElement('article');
+          ArrayDivName.textContent = 'Информация о объектах ObjInf:';
+          this.NamePlace.appendChild(ArrayDivName);
+        }
+      }
+
+      renderTable(Name, filterConfig) 
       {
         var ShowingArray=objManager.getObjs(Name, 0, 20, filterConfig)
         if (ShowingArray.length === 0) {
@@ -553,53 +563,63 @@ var NamePlace=document.getElementById('info');
         container.appendChild(table);
         return true;
       }
+    }
 
-      function deleteFromTable(Name, id)
+class lab7{
+       
+    constructor(viewclassname){
+        this.view=viewclassname;
+    }
+
+    deleteFromTable(Name, id)
       {
         if(objManager.removeObj(Name, id))
         {
-            renderTable(Name);
+            this.view.renderTable(Name);
             return true;
         };
         return false;
       }
 
-        function addInTable(Name, obj)
+    addInTable(Name, obj)
         {
             if(objManager.addObj(Name, obj))
             {
-                renderTable(Name);
+                this.view.renderTable(Name);
                 return true;
             };  
             return false;
         }
 
-        function editTable(Name, id, obj)
+    editTable(Name, id, obj)
         {
             if(objManager.editObj(Name, id, obj))
             {
-                renderTable(Name);
+                this.view.renderTable(Name);
                 return true;
             };
             return false;
-        }
-        const TableManager = {
-            renderTable,
-            deleteFromTable,
-            addInTable,
-            editTable,
-          };
-          
+        } 
 
-      //TableManager.addInTable('customers', { id: "23", description: 'Иванов Иван', createdAt: new Date(), author: 'Администратор', totalSpent: 500, discountPercent: 5 } )
-      //TableManager.addInTable('customers', { id: "22", description: 'Иванов Иван', createdAt: new Date(), author: 'Администратор', totalSpent: 500, discountPercent: 5 } )
-      //TableManager.renderTable('customers', {description: "Иванов Иван"});
-      //TableManager.deleteFromTable('customers', "1");
-      //TableManager.addInTable('customers', { id: "23", description: 'Иванов Иван', createdAt: new Date(), author: 'Администратор', totalSpent: 500, discountPercent: 5 } )
-      //TableManager.renderTable('employees');
-      //TableManager.addInTable('employees', {id: "430", description: "Петров Петр 2", createdAt: new Date("2024-01-16"), author: "Администратор", role: "Продавец", contactInfo: {phone: "+123456789", email: "petrov@example.com"}})
-      //TableManager.editTable('employees', '401', {id: "401", description: "Петров Петр new", createdAt: new Date("2024-01-16"), author: "Администратор", role: "Продавец", contactInfo: {phone: "+123456789", email: "petrov@example.com"}});
-      //TableManager.deleteFromTable('employees', "404");
+        display(Name, filterConfig)
+        {
+            this.view.renderTable(Name, filterConfig);
+            return true;
+        }
+    }
+
+var Viewclass = new View('admin');
+var test = new lab7(Viewclass);
+
+      //test.addInTable('customers', { id: "23", description: 'Иванов Иван', createdAt: new Date(), author: 'Администратор', totalSpent: 500, discountPercent: 5 } )
+      //test.addInTable('customers', { id: "22", description: 'Иванов Иван', createdAt: new Date(), author: 'Администратор', totalSpent: 500, discountPercent: 5 } )
+      //test.renderTable('customers', {description: "Иванов Иван"});
+      //test.deleteFromTable('customers', "1");
+      //test.addInTable('customers', { id: "23", description: 'Иванов Иван', createdAt: new Date(), author: 'Администратор', totalSpent: 500, discountPercent: 5 } )
+      test.display('employees');
+      test.addInTable('employees', {id: "430", description: "Петров Петр 2", createdAt: new Date("2024-01-16"), author: "Администратор", role: "Продавец", contactInfo: {phone: "+123456789", email: "petrov@example.com"}})
+      test.editTable('employees', '401', {id: "401", description: "Петров Петр new", createdAt: new Date("2024-01-16"), author: "Администратор", role: "Продавец", contactInfo: {phone: "+123456789", email: "petrov@example.com"}});
+      test.deleteFromTable('employees', "404");
 
 //console.log(objManager.addObj('customers', { id: '23', description: 'Иванов Иван', createdAt: new Date(), author: 'Администратор', totalSpent: 500, discountPercent: 5 }));
 
