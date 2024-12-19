@@ -361,16 +361,15 @@ class ObjManager {
     #sales = []; 
     #employees = [];
     #workSessions = [];
-
-
-
+    
     constructor(customers = [], products = [], invoices = [], sales = [], employees = [], workSessions = []) {
         this.#customers = customers;
         this.#products = products;
         this.#invoices = invoices;
         this.#sales = sales;
         this.#employees = employees;
-        this.#workSessions = workSessions;}
+        this.#workSessions = workSessions;
+}
 
     getObjs(arrayName, skip = 0, top = 20, filterConfig = {}) {
         let array = this.#getArrayByName(arrayName);
@@ -485,10 +484,50 @@ class ObjManager {
                 throw new Error('Unknown array name');
         }
     }
+
+    save() {
+        localStorage.setItem('customersdata', JSON.stringify(this.#customers));
+        localStorage.setItem('productsdata', JSON.stringify(this.#products));
+        localStorage.setItem('invoicesdata', JSON.stringify(this.#invoices));
+        localStorage.setItem('salesdata', JSON.stringify(this.#sales));
+        localStorage.setItem('employeesdata', JSON.stringify(this.#employees));
+        localStorage.setItem('workSessionsdata', JSON.stringify(this.#workSessions));
+      }
+
+    restore() {
+        var storedData = localStorage.getItem('customersdata');
+        if (storedData) {
+          this.#customers = JSON.parse(storedData);
+        }
+
+        storedData = localStorage.getItem('productsdata');
+        if (storedData) {
+          this.#products = JSON.parse(storedData);
+        }
+
+        storedData = localStorage.getItem('invoicesdata');
+        if (storedData) {
+          this.#invoices = JSON.parse(storedData);
+        }
+
+        storedData = localStorage.getItem('salesdata');
+        if (storedData) {
+          this.#sales = JSON.parse(storedData);
+        }
+
+        storedData = localStorage.getItem('employeesdata');
+        if (storedData) {
+          this.#employees = JSON.parse(storedData);
+        }
+
+        storedData = localStorage.getItem('workSessionsdata');
+        if (storedData) {
+          this.#workSessions = JSON.parse(storedData);
+        }
+    }
 }
 
 //model
-
 var objManager = new ObjManager(customers, products, invoices, sales, employees, workSessions);
 
 //View
@@ -549,32 +588,40 @@ class View{
         const tbody = document.createElement('tbody');
         ShowingArray.forEach(item => {
           const row = document.createElement('tr');
+          var newdate=new Date(item.createdAt)
           row.innerHTML = `
             <td>${item.id}</td>
             <td>${item.description}</td>
-            <td>${item.createdAt.toLocaleDateString()}</td>
+            <td>${newdate.toLocaleDateString()}</td>
             <td>${item.author}</td>
           `;
-  
           tbody.appendChild(row);
         });
-  
         table.appendChild(tbody);
         container.appendChild(table);
         return true;
       }
     }
 
-class lab7{
+class controler{
        
-    constructor(viewclassname){
+    constructor(viewclassname, modelname){
         this.view=viewclassname;
+        this.model=modelname;
+        this.#init();
     }
+
+    #init() {
+        this.model.restore();
+        this.view.renderTable('employees');
+      };
 
     deleteFromTable(Name, id)
       {
         if(objManager.removeObj(Name, id))
         {
+            localStorage.clear();
+            this.model.save();
             this.view.renderTable(Name);
             return true;
         };
@@ -585,6 +632,7 @@ class lab7{
         {
             if(objManager.addObj(Name, obj))
             {
+                this.model.save();
                 this.view.renderTable(Name);
                 return true;
             };  
@@ -595,6 +643,7 @@ class lab7{
         {
             if(objManager.editObj(Name, id, obj))
             {
+                this.model.save();
                 this.view.renderTable(Name);
                 return true;
             };
@@ -603,23 +652,24 @@ class lab7{
 
         display(Name, filterConfig)
         {
+            this.model.save();
             this.view.renderTable(Name, filterConfig);
             return true;
         }
     }
 
 var Viewclass = new View('admin');
-var test = new lab7(Viewclass);
+var controlerclass = new controler(Viewclass, objManager);
 
-      //test.addInTable('customers', { id: "23", description: 'Иванов Иван', createdAt: new Date(), author: 'Администратор', totalSpent: 500, discountPercent: 5 } )
-      //test.addInTable('customers', { id: "22", description: 'Иванов Иван', createdAt: new Date(), author: 'Администратор', totalSpent: 500, discountPercent: 5 } )
-      //test.renderTable('customers', {description: "Иванов Иван"});
-      //test.deleteFromTable('customers', "1");
-      //test.addInTable('customers', { id: "23", description: 'Иванов Иван', createdAt: new Date(), author: 'Администратор', totalSpent: 500, discountPercent: 5 } )
-      test.display('employees');
-      test.addInTable('employees', {id: "430", description: "Петров Петр 2", createdAt: new Date("2024-01-16"), author: "Администратор", role: "Продавец", contactInfo: {phone: "+123456789", email: "petrov@example.com"}})
-      test.editTable('employees', '401', {id: "401", description: "Петров Петр new", createdAt: new Date("2024-01-16"), author: "Администратор", role: "Продавец", contactInfo: {phone: "+123456789", email: "petrov@example.com"}});
-      test.deleteFromTable('employees', "404");
+      //controlerclass.addInTable('customers', { id: "23", description: 'Иванов Иван', createdAt: new Date(), author: 'Администратор', totalSpent: 500, discountPercent: 5 } )
+      //controlerclass.addInTable('customers', { id: "22", description: 'Иванов Иван', createdAt: new Date(), author: 'Администратор', totalSpent: 500, discountPercent: 5 } )
+      //controlerclass.display('customers', {description: "Иванов Иван"});
+      //controlerclass.deleteFromTable('customers', "1");
+      //controlerclass.addInTable('customers', { id: "23", description: 'Иванов Иван', createdAt: new Date(), author: 'Администратор', totalSpent: 500, discountPercent: 5 } )
+      //controlerclass.display('employees');
+      //controlerclass.addInTable('employees', {id: "430", description: "Петров Петр 2", createdAt: new Date("2024-01-16"), author: "Администратор", role: "Продавец", contactInfo: {phone: "+123456789", email: "petrov@example.com"}})
+      //controlerclass.editTable('employees', '401', {id: "401", description: "Петров Петр new", createdAt: new Date("2024-01-16"), author: "Администратор", role: "Продавец", contactInfo: {phone: "+123456789", email: "petrov@example.com"}});
+      //controlerclass.deleteFromTable('employees', "404");
 
 //console.log(objManager.addObj('customers', { id: '23', description: 'Иванов Иван', createdAt: new Date(), author: 'Администратор', totalSpent: 500, discountPercent: 5 }));
 
