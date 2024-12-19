@@ -544,6 +544,7 @@ class View{
         const username = document.createElement('article');
         username.textContent = this.user;
         this.roleContainer.appendChild(username);
+        this.buttonContainer.innerHTML='';
         if (this.user === 'admin') {
           const editButton = document.createElement('button');
           editButton.textContent = 'Редактировать';
@@ -553,7 +554,6 @@ class View{
           deleteButton.textContent = 'Удалить';
           const SearchButton = document.createElement('button');
           SearchButton.textContent = 'Поиск';
-          this.buttonContainer.innerHTML='';
           this.buttonContainer.appendChild(editButton);
           this.buttonContainer.appendChild(addButton);
           this.buttonContainer.appendChild(deleteButton);
