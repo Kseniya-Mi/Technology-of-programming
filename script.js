@@ -396,10 +396,6 @@ class ObjManager {
             return false;
         }
 
-        if (!(obj.createdAt instanceof Date)) {
-            return false;
-        }
-
         if (typeof obj.author !== 'string' || obj.author.length === 0) {
             
             return false;
@@ -423,7 +419,6 @@ class ObjManager {
         var existingObj = array.find(o => o.id === id);
 
         if (!existingObj || !this.validateObj(obj)) {
-            console.log(11);
             return false;
         }
 
@@ -534,15 +529,22 @@ var objManager = new ObjManager(customers, products, invoices, sales, employees,
 
 class View{
 
-    constructor(role) {
-        this.user = role;
+    constructor() {
+        this.user = "none";
         this.buttonContainer = document.getElementById('buttons_place');
         this.roleContainer = document.getElementById('role');
         this.NamePlace = document.getElementById('info');
+        this.renderLogin();
+        this.renderAdminControls();
+    }
     
+    renderAdminControls()
+    {
+        this.roleContainer.innerHTML='Ваша роль:'
+        const username = document.createElement('article');
+        username.textContent = this.user;
+        this.roleContainer.appendChild(username);
         if (this.user === 'admin') {
-          const username = document.createElement('article');
-          username.textContent = this.user;
           const editButton = document.createElement('button');
           editButton.textContent = 'Редактировать';
           const addButton = document.createElement('button');
@@ -551,17 +553,41 @@ class View{
           deleteButton.textContent = 'Удалить';
           const SearchButton = document.createElement('button');
           SearchButton.textContent = 'Поиск';
-    
-          this.roleContainer.appendChild(username);
+          this.buttonContainer.innerHTML='';
           this.buttonContainer.appendChild(editButton);
           this.buttonContainer.appendChild(addButton);
           this.buttonContainer.appendChild(deleteButton);
           this.buttonContainer.appendChild(SearchButton);
     
-          const ArrayDivName = document.createElement('article');
-          ArrayDivName.textContent = 'Информация о объектах ObjInf:';
-          this.NamePlace.appendChild(ArrayDivName);
-        }
+          }
+      }
+
+      renderManipulationForm(action) {
+        const container = document.getElementById('manipulationFormContainer');
+        container.innerHTML = `
+          <form id="manipulationForm">
+            <input type="hidden" name="action" value="${action}">
+            <label for="data">Введите данные (JSON):</label>
+            <input type="text" id="data" name="data" required>
+            <button type="submit">Применить</button>
+          </form>
+        `;
+      }
+
+      updateUser(username) {
+        this.user = username;
+        this.renderAdminControls();
+      }
+
+      renderLogin() {
+        const loginContainer = document.getElementById('loginContainer');
+        loginContainer.innerHTML = `
+          <form id="loginForm">
+            <label for="username">Введите логин:</label>
+            <input type="text" id="username" name="username" required>
+            <button type="submit">Войти</button>
+          </form>
+        `;
       }
 
       renderTable(Name, filterConfig) 
@@ -608,13 +634,75 @@ class controler{
     constructor(viewclassname, modelname){
         this.view=viewclassname;
         this.model=modelname;
+        this.lastarray=localStorage.getItem('last')||'employees';
+        this.user= localStorage.getItem('userRole')||"none";
+        this.view.updateUser(this.user);
         this.#init();
     }
 
     #init() {
         this.model.restore();
-        this.view.renderTable('employees');
+        this.view.renderTable(this.lastarray);
+        this.bindLoginEvent();
+        this.bindManipulationEvents();
       };
+
+      bindLoginEvent() {
+        const loginForm = document.getElementById('loginForm');
+        loginForm.addEventListener('submit', (event) => {
+          event.preventDefault();
+          const formData = new FormData(loginForm);
+          const username = formData.get('username');
+    
+          if (username) {
+            this.user = username;
+            localStorage.setItem('userRole', username);
+            this.view.updateUser(username);
+          }
+        });
+      }
+
+      bindManipulationEvents() {
+        const buttonContainer = document.getElementById('buttons_place');
+    
+        buttonContainer.addEventListener('click', (event) => {
+          if (event.target.tagName === 'BUTTON') {
+            const action = event.target.textContent;
+    
+            switch (action) {
+              case 'Добавить':
+              case 'Редактировать':
+              case 'Удалить':
+              case 'Поиск':
+                this.view.renderManipulationForm(action);
+                break;
+            }
+          }
+        });
+    
+        document.getElementById('manipulationFormContainer').addEventListener('submit', (event) => {
+          event.preventDefault();
+    
+          const formData = new FormData(event.target);
+          const action = formData.get('action');
+          const data = JSON.parse(formData.get('data'));
+    
+          switch (action) {
+            case 'Добавить':
+              this.addInTable(data.arrayName, data.obj)
+              break;
+            case 'Редактировать':
+              this.editTable(data.arrayName, data.id, data.obj);
+              break;
+            case 'Удалить':
+            this.deleteFromTable(data.arrayName, data.id);
+              break;
+            case 'Поиск':
+              this.display(data);
+              return;
+          }
+            });
+      }
 
     deleteFromTable(Name, id)
       {
@@ -622,6 +710,7 @@ class controler{
         {
             localStorage.clear();
             this.model.save();
+            localStorage.setItem('last', Name);
             this.view.renderTable(Name);
             return true;
         };
@@ -633,6 +722,7 @@ class controler{
             if(objManager.addObj(Name, obj))
             {
                 this.model.save();
+                localStorage.setItem('last', Name);
                 this.view.renderTable(Name);
                 return true;
             };  
@@ -644,6 +734,7 @@ class controler{
             if(objManager.editObj(Name, id, obj))
             {
                 this.model.save();
+                localStorage.setItem('last', Name);
                 this.view.renderTable(Name);
                 return true;
             };
@@ -653,12 +744,13 @@ class controler{
         display(Name, filterConfig)
         {
             this.model.save();
+            localStorage.setItem('last', Name);
             this.view.renderTable(Name, filterConfig);
             return true;
         }
     }
 
-var Viewclass = new View('admin');
+var Viewclass = new View();
 var controlerclass = new controler(Viewclass, objManager);
 
       //controlerclass.addInTable('customers', { id: "23", description: 'Иванов Иван', createdAt: new Date(), author: 'Администратор', totalSpent: 500, discountPercent: 5 } )
